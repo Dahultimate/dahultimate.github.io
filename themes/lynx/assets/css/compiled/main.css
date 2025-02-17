@@ -581,7 +581,6 @@ video {
 
 .prose :where(a):not(:where([class~="not-prose"],[class~="not-prose"] *)):hover {
   text-decoration: none;
-  background-color: #9333ea;
   border-radius: 0.09rem;
 }
 
