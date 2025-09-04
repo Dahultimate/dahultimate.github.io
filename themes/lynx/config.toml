@@ -18,7 +18,7 @@ disableKinds = ["taxonomy", "term"]
     { instagram = "https://www.instagram.com/dahultimate_annecy" },
     { youtube = "https://www.youtube.com/@Dahultimate" },
     { helloasso = {href = "https://www.helloasso.com/associations/dahultimate", text = "HelloAsso", icon = "helloasso" }},
-    { link = {href = "mailto:contact@dahultimate.fr", text = "Nous contacter par e-mail", icon = "email" }}
+    { link = {href = "mailto:secretaire.dahultimate@gmail.com", text = "Nous contacter par e-mail", icon = "email" }}
   ]
 
 [module]
