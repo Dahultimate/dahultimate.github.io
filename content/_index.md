@@ -13,3 +13,6 @@ Entraînements printemps/été
 |----------|----------------------------------------------------------------------------------------------|-------|
 | Lundi    | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
 | Mercredi | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
+
+
+Retrouvez-nous tous les mercredis de l'été à 19h sur le Pâquier pour essayer l'Ultimate !
