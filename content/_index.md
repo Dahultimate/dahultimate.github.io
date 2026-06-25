@@ -1,18 +1,23 @@
++++
++++
+
+{{< banner >}}
+:sunny: :flying_disc: **Les sessions d'été commencent le 1er juillet !** Retrouvez-nous tous les mercredis à partir de 18h30 sur le Pâquier pour essayer l'Ultimate ! Ouvert à tous, débutants comme confirmés.
+{{< /banner >}}
+
 [Découvrir les règles de base de l'ultimate en vidéo.](https://www.youtube.com/watch?v=6WcBqjnqbac)
 
 Entraînements automne/hiver
-| Jour     | Lieu d'entraînement                                                                          |Horaire|
+| Jour | Lieu d'entraînement |Horaire|
 |----------|----------------------------------------------------------------------------------------------|-------|
-| Lundi    | [Gymnase du collège Raoul Blanchard à Annecy](https://maps.app.goo.gl/pExufx2AEYzH2oVN6)     |20:15|
+| Lundi | [Gymnase du collège Raoul Blanchard à Annecy](https://maps.app.goo.gl/pExufx2AEYzH2oVN6) |20:15|
 | Mercredi | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
-| Vendredi    | [Gymnase du collège Raoul Blanchard à Annecy](https://maps.app.goo.gl/pExufx2AEYzH2oVN6)  |20:15|
-
+| Vendredi | [Gymnase du collège Raoul Blanchard à Annecy](https://maps.app.goo.gl/pExufx2AEYzH2oVN6) |20:15|
 
 Entraînements printemps/été
-| Jour     | Lieu d'entraînement                                                                          |Horaire|
+| Jour | Lieu d'entraînement |Horaire|
 |----------|----------------------------------------------------------------------------------------------|-------|
-| Lundi    | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
+| Lundi | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
 | Mercredi | [Terrain annexe du complexe Max Decarre à Seynod](https://maps.app.goo.gl/6a3esDQsYpAZMHDC9) |19:30|
 
-
-Retrouvez-nous tous les mercredis de l'été à 19h sur le Pâquier pour essayer l'Ultimate !
+Retrouvez-nous tous les mercredis de l'été à 18h30 sur le Pâquier pour essayer l'Ultimate !

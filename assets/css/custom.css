@@ -7,3 +7,21 @@
       #61B984 100%
     );
   }
+
+.banner {
+  margin: 0 auto 2rem;
+  max-width: 42rem;
+  border: 1px solid #a855f7;
+  border-left-width: 4px;
+  border-radius: 0.5rem;
+  background: rgba(168, 85, 247, 0.08);
+  padding: 0.85rem 1.15rem;
+  text-align: center;
+}
+.banner .banner-body p {
+  margin: 0;
+}
+.dark .banner {
+  border-color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+}
