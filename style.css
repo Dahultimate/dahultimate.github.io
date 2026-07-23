@@ -1,0 +1,243 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    background:#1f2937;
+
+    color:white;
+
+    display:flex;
+    justify-content:center;
+
+    padding:40px 20px;
+}
+
+.container{
+
+    width:100%;
+    max-width:760px;
+
+    text-align:center;
+}
+
+.logo{
+
+    width:150px;
+    display:block;
+    margin:auto;
+    margin-bottom:18px;
+    border-radius: 100%;
+}
+
+h1{
+
+    font-size:3rem;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.subtitle{
+
+    color:#b8bfd1;
+    font-size:1.3rem;
+    margin-bottom:30px;
+}
+
+.announcement{
+
+    border:2px solid #9b5cf3;
+    background:#2a3144;
+
+    border-radius:10px;
+
+    padding:18px 22px;
+
+    margin:0 auto 35px;
+
+    color:#d8dcea;
+
+    line-height:1.7;
+}
+
+.video-link{
+
+    color:#b67cff;
+
+    text-decoration:underline;
+
+    display:inline-block;
+
+    margin-bottom:40px;
+}
+
+.training{
+
+    margin-bottom:45px;
+}
+
+.training h2{
+
+    font-size:1.35rem;
+    margin-bottom:18px;
+
+    font-weight:500;
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+
+    border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+th{
+
+    padding:10px;
+    font-weight:700;
+}
+
+td{
+
+    padding:13px 10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+td:first-child,
+th:first-child{
+
+    text-align:left;
+}
+
+td:last-child,
+th:last-child{
+
+    text-align:right;
+}
+
+td:nth-child(2),
+th:nth-child(2){
+
+    text-align:center;
+}
+
+table a{
+
+    color:#a56dff;
+}
+
+.summer{
+
+    color:#d6dae8;
+    margin:25px auto 35px;
+
+    line-height:1.6;
+
+    max-width:650px;
+}
+
+.buttons{
+
+    width:100%;
+    max-width:420px;
+
+    margin:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.btn{
+
+    text-decoration:none;
+
+    color:white;
+
+    padding:15px;
+
+    border-radius:5px;
+
+    font-size:1.25rem;
+
+    transition:.2s;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+    filter:brightness(1.05);
+}
+
+.facebook{
+
+    background:#2d8cff;
+}
+
+.instagram{
+
+    background:linear-gradient(90deg,#5d5df6,#ff2453);
+}
+
+.youtube{
+
+    background:#ff1818;
+}
+
+.helloasso{
+
+    background:linear-gradient(90deg,#ff9d1d,#64d48b);
+}
+
+.email{
+
+    background:linear-gradient(90deg,#7a29d8,#8c2ce0);
+}
+
+@media (max-width:700px){
+
+    body{
+
+        padding:20px 15px;
+    }
+
+    h1{
+
+        font-size:2.4rem;
+    }
+
+    .subtitle{
+
+        font-size:1.05rem;
+    }
+
+    table{
+
+        display:block;
+        overflow-x:auto;
+    }
+
+    .btn{
+
+        font-size:1rem;
+        padding:14px;
+    }
+
+}
