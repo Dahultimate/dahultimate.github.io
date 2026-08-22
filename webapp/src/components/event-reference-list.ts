@@ -104,6 +104,7 @@ export class EventReferenceList extends LitElement {
                 <tr>
                   <th>Libellé</th>
                   <th>Ordre</th>
+                  ${this.kind === "event_type" ? html`<th>Famille</th>` : ""}
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -113,6 +114,9 @@ export class EventReferenceList extends LitElement {
                     <tr>
                       <td>${item.label}</td>
                       <td>${item.sortOrder}</td>
+                      ${this.kind === "event_type"
+                        ? html`<td>${item.eventFamily === "tournoi" ? "Tournoi / Hat" : "Sportif"}</td>`
+                        : ""}
                       <td>
                         <button @click=${() => (this.editingItem = item)}>Modifier</button>
                         <button class="danger" @click=${() => this.handleDelete(item)}>Supprimer</button>

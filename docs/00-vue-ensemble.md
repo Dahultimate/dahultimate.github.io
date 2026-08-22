@@ -19,8 +19,10 @@ Chaque phase est testée **en local** (`npm run dev` dans `webapp/`, servi sur `
 ## Rôles
 
 Un membre est stocké dans la table `members`, toujours "joueur" de base, avec deux droits additifs :
-- `is_coach` : peut créer/modifier des événements.
-- `is_admin` : peut gérer les membres, les référentiels (types d'événement, formats, divisions, catégories d'âge) et réinitialiser les mots de passe.
+- `is_coach` : rôle réservé pour de futurs droits (actuellement sans droit d'écriture supplémentaire — voir note ci-dessous).
+- `is_admin` : peut gérer les membres, les référentiels (types d'événement, formats, divisions, catégories d'âge), créer/modifier les événements, et réinitialiser les mots de passe.
+
+**Changement par rapport à l'énoncé initial** : la spec prévoyait que les coachs puissent créer/modifier des événements (comme les admins). Décision prise après la phase 6 : cette action est réservée aux **admins uniquement** (`supabase/migrations/0007_events_edit_admin_only.sql`). Les coachs conservent tous les autres droits prévus par la spec.
 
 ## Suivi des phases
 
@@ -31,8 +33,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 | 2 | Gestion des membres (admin) | ✅ Validé |
 | 3 | Catégories d'âge | ✅ Validé |
 | 4 | Référentiels d'événements (admin) | ✅ Validé |
-| 5 | Création & modification d'événements | 🔧 En cours |
-| 6 | Consultation des événements | ⏳ À venir |
+| 5 | Création & modification d'événements | ✅ Validé |
+| 6 | Consultation des événements | 🔧 En cours |
 | 7 | Déclaration de disponibilité | ⏳ À venir |
 | 8 | Finitions ergonomie, sécurité et documentation finale | ⏳ À venir |
 

@@ -1,10 +1,12 @@
 import { LitElement, css, html } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import type { SportEvent } from "../domain/event";
-import "./events-list";
+import type { Member } from "../domain/member";
+import "./event-family-list";
+import "./event-detail";
 import "./event-form";
 
-type ViewMode = { mode: "list" } | { mode: "create" } | { mode: "edit"; event: SportEvent };
+type ViewMode = { mode: "lists" } | { mode: "detail"; event: SportEvent } | { mode: "create" } | { mode: "edit"; event: SportEvent };
 
 @customElement("events-view")
 export class EventsView extends LitElement {
@@ -34,31 +36,55 @@ export class EventsView extends LitElement {
     }
   `;
 
-  @state() private view: ViewMode = { mode: "list" };
+  @property({ attribute: false }) member!: Member;
+
+  @state() private view: ViewMode = { mode: "lists" };
   @state() private listRefreshToken = 0;
 
-  private goToList(): void {
-    this.view = { mode: "list" };
+  private get canManage(): boolean {
+    return this.member.isAdmin;
+  }
+
+  private goToLists(): void {
+    this.view = { mode: "lists" };
     this.listRefreshToken += 1;
   }
 
   override render() {
+    if (this.view.mode !== "lists") {
+      return html`
+        ${this.view.mode === "detail"
+          ? html`<event-detail
+              .event=${this.view.event}
+              .member=${this.member}
+              @back=${() => this.goToLists()}
+              @edit=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "edit", event: e.detail })}
+            ></event-detail>`
+          : html`<event-form
+              .event=${this.view.mode === "edit" ? this.view.event : null}
+              @saved=${() => this.goToLists()}
+              @cancel=${() => this.goToLists()}
+            ></event-form>`}
+      `;
+    }
+
     return html`
       <header>
         <h2>Événements</h2>
-        ${this.view.mode === "list" ? html`<button @click=${() => (this.view = { mode: "create" })}>+ Créer un événement</button>` : ""}
+        ${this.canManage ? html`<button @click=${() => (this.view = { mode: "create" })}>+ Créer un événement</button>` : ""}
       </header>
-
-      ${this.view.mode === "list"
-        ? html`<events-list
-            .refreshToken=${this.listRefreshToken}
-            @edit=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "edit", event: e.detail })}
-          ></events-list>`
-        : html`<event-form
-            .event=${this.view.mode === "edit" ? this.view.event : null}
-            @saved=${() => this.goToList()}
-            @cancel=${() => this.goToList()}
-          ></event-form>`}
+      <event-family-list
+        family="sportif"
+        heading="Événements sportifs"
+        .refreshToken=${this.listRefreshToken}
+        @select=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "detail", event: e.detail })}
+      ></event-family-list>
+      <event-family-list
+        family="tournoi"
+        heading="Tournois et Hats"
+        .refreshToken=${this.listRefreshToken}
+        @select=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "detail", event: e.detail })}
+      ></event-family-list>
     `;
   }
 }

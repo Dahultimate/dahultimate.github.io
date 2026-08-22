@@ -2,7 +2,9 @@
 
 ## Objectif
 
-Permettre aux admins et aux coachs de créer et modifier un événement (type, catégorie, format, division, lieu, date, porteur de projet, date butoir, catégories autorisées à participer).
+Permettre aux admins de créer et modifier un événement (type, catégorie, format, division, lieu, date, porteur de projet, date butoir, catégories autorisées à participer).
+
+> **Changement par rapport à l'énoncé initial** : la spec prévoyait que les coachs puissent aussi créer/modifier des événements. Décision prise en cours de développement (après la phase 6) : cette action est réservée aux **admins uniquement**. Voir `supabase/migrations/0007_events_edit_admin_only.sql`. Les coachs conservent tous les autres droits prévus par la spec (consultation, déclaration de disponibilité).
 
 ## Actions réalisées (Claude)
 

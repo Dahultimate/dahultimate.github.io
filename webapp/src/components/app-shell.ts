@@ -13,15 +13,15 @@ interface TabDef {
   id: Tab;
   label: string;
   visible: (member: Member) => boolean;
-  render: () => TemplateResult;
+  render: (member: Member) => TemplateResult;
 }
 
 const TABS: readonly TabDef[] = [
   {
     id: "events",
     label: "Événements",
-    visible: (member) => member.isCoach || member.isAdmin,
-    render: () => html`<events-view></events-view>`,
+    visible: () => true,
+    render: (member) => html`<events-view .member=${member}></events-view>`,
   },
   {
     id: "members",
@@ -119,7 +119,7 @@ export class AppShell extends LitElement {
       </nav>
       <main>
         ${activeTab
-          ? activeTab.render()
+          ? activeTab.render(this.member)
           : html`<p>Connecté avec succès. Le contenu de l'application sera ajouté au fil des prochaines phases.</p>`}
       </main>
     `;

@@ -4,7 +4,7 @@ import {
   createEventReferenceItem,
   updateEventReferenceItem,
 } from "../services/event-reference-items.repository";
-import type { EventReferenceItem, EventReferenceKind } from "../domain/event-reference";
+import type { EventFamily, EventReferenceItem, EventReferenceKind } from "../domain/event-reference";
 
 @customElement("event-reference-form")
 export class EventReferenceForm extends LitElement {
@@ -30,7 +30,8 @@ export class EventReferenceForm extends LitElement {
       font-weight: 600;
       color: #374151;
     }
-    input {
+    input,
+    select {
       padding: 0.5rem 0.65rem;
       border: 1px solid #d1d5db;
       border-radius: 8px;
@@ -76,6 +77,7 @@ export class EventReferenceForm extends LitElement {
 
   @state() private label = "";
   @state() private sortOrder = 0;
+  @state() private eventFamily: EventFamily | null = null;
   @state() private errorMessage: string | null = null;
   @state() private submitting = false;
 
@@ -83,6 +85,7 @@ export class EventReferenceForm extends LitElement {
     if (!changed.has("item")) return;
     this.label = this.item?.label ?? "";
     this.sortOrder = this.item?.sortOrder ?? 0;
+    this.eventFamily = this.item?.eventFamily ?? (this.kind === "event_type" ? "sportif" : null);
   }
 
   private async handleSubmit(event: Event): Promise<void> {
@@ -91,10 +94,18 @@ export class EventReferenceForm extends LitElement {
       this.errorMessage = "Le libellé est obligatoire.";
       return;
     }
+    if (this.kind === "event_type" && !this.eventFamily) {
+      this.errorMessage = "La famille (sportif ou tournoi/hat) est obligatoire.";
+      return;
+    }
     this.errorMessage = null;
     this.submitting = true;
 
-    const input = { label: this.label.trim(), sortOrder: this.sortOrder };
+    const input = {
+      label: this.label.trim(),
+      sortOrder: this.sortOrder,
+      eventFamily: this.kind === "event_type" ? this.eventFamily : null,
+    };
     const errorMessage = this.item
       ? await updateEventReferenceItem(this.item.id, input)
       : await createEventReferenceItem(this.kind, input);
@@ -106,6 +117,7 @@ export class EventReferenceForm extends LitElement {
     }
     this.label = "";
     this.sortOrder = 0;
+    this.eventFamily = this.kind === "event_type" ? "sportif" : null;
     this.dispatchEvent(new CustomEvent("saved", { bubbles: true, composed: true }));
   }
 
@@ -133,6 +145,21 @@ export class EventReferenceForm extends LitElement {
             @input=${(e: Event) => (this.sortOrder = Number((e.target as HTMLInputElement).value))}
           />
         </div>
+        ${this.kind === "event_type"
+          ? html`
+              <div class="field">
+                <label for="family-${this.kind}">Famille</label>
+                <select
+                  id="family-${this.kind}"
+                  .value=${this.eventFamily ?? "sportif"}
+                  @change=${(e: Event) => (this.eventFamily = (e.target as HTMLSelectElement).value as EventFamily)}
+                >
+                  <option value="sportif">Sportif (Championnat, Coupe, Winter League…)</option>
+                  <option value="tournoi">Tournoi / Hat</option>
+                </select>
+              </div>
+            `
+          : ""}
         <button type="submit" ?disabled=${this.submitting}>
           ${this.submitting ? "…" : this.item ? "Enregistrer" : "Ajouter"}
         </button>
