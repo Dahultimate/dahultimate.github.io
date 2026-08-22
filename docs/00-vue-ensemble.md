@@ -34,8 +34,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 | 3 | Catégories d'âge | ✅ Validé |
 | 4 | Référentiels d'événements (admin) | ✅ Validé |
 | 5 | Création & modification d'événements | ✅ Validé |
-| 6 | Consultation des événements | 🔧 En cours |
-| 7 | Déclaration de disponibilité | ⏳ À venir |
+| 6 | Consultation des événements | ✅ Validé |
+| 7 | Déclaration de disponibilité | 🔧 En cours |
 | 8 | Finitions ergonomie, sécurité et documentation finale | ⏳ À venir |
 
 Chaque phase est détaillée dans son propre fichier `docs/NN-nom.md`, avec pour chacune :
