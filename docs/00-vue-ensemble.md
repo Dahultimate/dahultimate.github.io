@@ -10,6 +10,12 @@ Application de gestion des disponibilités pour les membres de l'association Dah
 
 Le dossier `webapp/` contient le code source du frontend (jamais publié tel quel). Le dossier `supabase/` contient les migrations SQL et les Edge Functions. Le pipeline CI (`.github/workflows/deploy.yaml`) construit `webapp/`, assemble un dossier `publish/` combinant le site statique existant + le build de l'app sous `app/`, puis déploie ce dossier sur la branche `gh-pages`.
 
+## Méthode de travail
+
+Chaque phase est testée **en local** (`npm run dev` dans `webapp/`, servi sur `http://localhost:5173/app/`). Le déploiement réel sur `https://www.dahultimate.fr/app` (configuration des variables GitHub, `git push` sur `master`) n'interviendra qu'à la toute fin du projet, une fois toutes les phases validées.
+
+**Note environnement (Windows)** : toujours lancer `npm install` / `npm run ...` depuis **PowerShell**, pas depuis Git Bash/WSL — sur ce poste, un `npm install` lancé depuis Git Bash ne génère pas les raccourcis `.cmd`/`.ps1` nécessaires à Windows, ce qui casse `npm run` avec une erreur `'tsc'/'vite' n'est pas reconnu`.
+
 ## Rôles
 
 Un membre est stocké dans la table `members`, toujours "joueur" de base, avec deux droits additifs :
@@ -20,9 +26,9 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 
 | Phase | Sujet | Statut |
 |---|---|---|
-| 0 | Socle technique & pipeline de déploiement | 🔧 En cours |
-| 1 | Authentification & connexion | ⏳ À venir |
-| 2 | Gestion des membres (admin) | ⏳ À venir |
+| 0 | Socle technique & pipeline de déploiement | ✅ Validé |
+| 1 | Authentification & connexion | ✅ Validé |
+| 2 | Gestion des membres (admin) | 🔧 En cours |
 | 3 | Catégories d'âge | ⏳ À venir |
 | 4 | Référentiels d'événements (admin) | ⏳ À venir |
 | 5 | Création & modification d'événements | ⏳ À venir |

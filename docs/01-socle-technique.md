@@ -14,7 +14,7 @@ Mettre en place le squelette de l'application (`webapp/`), la connexion (encore 
     - `src/services/` — accès à Supabase (`supabase-client.ts`, `connection.service.ts`).
     - `src/domain/` — types et objets métier partagés (`connection-status.ts`).
   - `src/components/app-root.ts` : écran d'accueil minimal de l'app, qui vérifie la connexion au projet Supabase configuré et l'affiche (checking / connecté / erreur), sans dépendre d'une table applicative (aucune table n'existe encore).
-- **Sécurité des dépendances** : `vite` fixé en version 8 (la ligne 5.x embarque une version d'`esbuild` avec une faille connue sur le serveur de dev — `npm audit` est propre sur ce projet).
+- **Sécurité des dépendances** : `vite` fixé en version 7.x (la ligne 5.x embarque une version d'`esbuild` avec une faille connue sur le serveur de dev). La version 8 a été essayée puis abandonnée : elle remplace Rollup par Rolldown comme bundler par défaut, dont le binding natif Windows (`@rolldown/binding-win32-x64-msvc`) échouait systématiquement à s'installer sur ce poste. La 7.x utilise encore Rollup + esbuild ^0.25 (faille déjà corrigée) — stable et sans ce problème. `npm audit` est propre sur ce projet.
 - **Pipeline CI** (`.github/workflows/deploy.yaml`) étendu :
   1. installe Node.js 22 et les dépendances de `webapp/` (`npm ci`),
   2. build l'app (`npm run build`, avec les variables `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` injectées depuis les variables de repository GitHub),
