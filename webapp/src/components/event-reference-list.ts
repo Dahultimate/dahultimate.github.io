@@ -16,6 +16,9 @@ export class EventReferenceList extends LitElement {
       font-size: 1rem;
       margin: 0 0 0.6rem;
     }
+    .table-scroll {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -99,6 +102,7 @@ export class EventReferenceList extends LitElement {
       ${this.loading
         ? html`<p>Chargement…</p>`
         : html`
+            <div class="table-scroll">
             <table>
               <thead>
                 <tr>
@@ -126,6 +130,7 @@ export class EventReferenceList extends LitElement {
                 )}
               </tbody>
             </table>
+            </div>
           `}
       <event-reference-form
         .kind=${this.kind}

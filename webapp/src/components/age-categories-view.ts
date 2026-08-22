@@ -28,6 +28,9 @@ export class AgeCategoriesView extends LitElement {
       color: #6b7280;
       margin: 1rem 0 0.4rem;
     }
+    .table-scroll {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -113,6 +116,7 @@ export class AgeCategoriesView extends LitElement {
     const rows = this.categories.filter((c) => c.sex === sex);
     return html`
       <h3>${sex === "F" ? "Femmes" : "Hommes"}</h3>
+      <div class="table-scroll">
       <table>
         <thead>
           <tr>
@@ -136,6 +140,7 @@ export class AgeCategoriesView extends LitElement {
           )}
         </tbody>
       </table>
+      </div>
     `;
   }
 

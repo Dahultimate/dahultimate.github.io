@@ -35,8 +35,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 | 4 | Référentiels d'événements (admin) | ✅ Validé |
 | 5 | Création & modification d'événements | ✅ Validé |
 | 6 | Consultation des événements | ✅ Validé |
-| 7 | Déclaration de disponibilité | 🔧 En cours |
-| 8 | Finitions ergonomie, sécurité et documentation finale | ⏳ À venir |
+| 7 | Déclaration de disponibilité | ✅ Validé |
+| 8 | Finitions ergonomie, sécurité et documentation finale | 🔧 En cours |
 
 Chaque phase est détaillée dans son propre fichier `docs/NN-nom.md`, avec pour chacune :
 - **Objectif** : ce que la fonctionnalité apporte.
@@ -45,3 +45,5 @@ Chaque phase est détaillée dans son propre fichier `docs/NN-nom.md`, avec pour
 - **Comment tester** : procédure pour valider la fonctionnalité avant de passer à la phase suivante.
 
 Le plan complet et les décisions d'architecture sont détaillés dans chaque doc de phase au fur et à mesure de leur avancement.
+
+Une fois toutes les phases validées, [docs/10-guide-administration.md](10-guide-administration.md) prend le relai comme référence d'administration au quotidien et de déploiement final.

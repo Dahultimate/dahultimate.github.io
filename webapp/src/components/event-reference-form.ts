@@ -32,6 +32,7 @@ export class EventReferenceForm extends LitElement {
     }
     input,
     select {
+      box-sizing: border-box;
       padding: 0.5rem 0.65rem;
       border: 1px solid #d1d5db;
       border-radius: 8px;

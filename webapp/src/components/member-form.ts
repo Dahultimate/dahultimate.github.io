@@ -25,6 +25,8 @@ export class MemberForm extends LitElement {
     }
     input,
     select {
+      box-sizing: border-box;
+      width: 100%;
       padding: 0.55rem 0.7rem;
       border: 1px solid #d1d5db;
       border-radius: 8px;

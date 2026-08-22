@@ -13,6 +13,9 @@ export class MembersList extends LitElement {
       display: block;
       font-family: system-ui, sans-serif;
     }
+    .table-scroll {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -145,6 +148,7 @@ export class MembersList extends LitElement {
 
     return html`
       ${this.errorMessage ? html`<p class="error">${this.errorMessage}</p>` : ""}
+      <div class="table-scroll">
       <table>
         <thead>
           <tr>
@@ -182,6 +186,7 @@ export class MembersList extends LitElement {
           )}
         </tbody>
       </table>
+      </div>
     `;
   }
 }
