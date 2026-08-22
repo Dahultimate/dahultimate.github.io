@@ -1,0 +1,5 @@
+node_modules/
+webapp/dist/
+publish/
+*.local
+.DS_Store
