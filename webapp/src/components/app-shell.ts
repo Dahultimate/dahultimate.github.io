@@ -2,6 +2,8 @@ import { LitElement, css, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { signOut } from "../services/auth.service";
 import type { Member } from "../domain/member";
+import type { SportEvent } from "../domain/event";
+import "./home-view";
 import "./admin-members-view";
 import "./age-categories-view";
 import "./event-reference-admin-view";
@@ -14,45 +16,14 @@ interface TabDef {
   label: string;
   icon: string;
   visible: (member: Member) => boolean;
-  render: (member: Member) => TemplateResult;
 }
 
 const TABS: readonly TabDef[] = [
-  {
-    id: "home",
-    label: "Accueil",
-    icon: "🏠",
-    visible: () => true,
-    render: (member) => html`<p>Bonjour ${member.firstName}, bienvenue sur DahultiApp.</p>`,
-  },
-  {
-    id: "events",
-    label: "Événements",
-    icon: "📅",
-    visible: () => true,
-    render: (member) => html`<events-view .member=${member}></events-view>`,
-  },
-  {
-    id: "members",
-    label: "Membres",
-    icon: "👥",
-    visible: (member) => member.isAdmin,
-    render: () => html`<admin-members-view></admin-members-view>`,
-  },
-  {
-    id: "age-categories",
-    label: "Catégories",
-    icon: "🎂",
-    visible: (member) => member.isAdmin,
-    render: () => html`<age-categories-view></age-categories-view>`,
-  },
-  {
-    id: "event-references",
-    label: "Référentiels",
-    icon: "⚙️",
-    visible: (member) => member.isAdmin,
-    render: () => html`<event-reference-admin-view></event-reference-admin-view>`,
-  },
+  { id: "home", label: "Accueil", icon: "🏠", visible: () => true },
+  { id: "events", label: "Événements", icon: "📅", visible: () => true },
+  { id: "members", label: "Membres", icon: "👥", visible: (member) => member.isAdmin },
+  { id: "age-categories", label: "Catégories", icon: "🎂", visible: (member) => member.isAdmin },
+  { id: "event-references", label: "Référentiels", icon: "⚙️", visible: (member) => member.isAdmin },
 ];
 
 @customElement("app-shell")
@@ -62,114 +33,208 @@ export class AppShell extends LitElement {
       display: block;
       font-family: system-ui, sans-serif;
       min-height: 100vh;
-      box-sizing: border-box;
-      padding-bottom: 4.25rem;
     }
     header {
-      display: flex;
-      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      padding: 0.85rem 1.25rem;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 0.75rem 1rem;
+      background: var(--color-primary, #7c3aed);
+      color: white;
+      box-shadow: var(--shadow-sm, none);
+    }
+    .menu-toggle {
+      justify-self: start;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 50%;
+      font-size: 1.15rem;
+      cursor: pointer;
+    }
+    .title {
+      justify-self: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
     }
     .who {
-      font-size: 0.9rem;
-      color: #1f2933;
-    }
-    header button {
-      padding: 0.4rem 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      font-size: 0.82rem;
+      justify-self: end;
+      font-size: 0.85rem;
+      text-align: right;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     main {
       padding: 1.25rem;
-      color: #374151;
-      max-width: 720px;
+      color: var(--color-text, #1f2937);
+      max-width: 760px;
       margin: 0 auto;
     }
-    nav {
+    .backdrop {
       position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      background: white;
-      border-top: 1px solid #e5e7eb;
-      padding-bottom: env(safe-area-inset-bottom, 0);
+      inset: 0;
+      background: rgba(17, 12, 34, 0.35);
+      z-index: 30;
     }
-    nav button {
-      flex: 1;
+    .drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: min(280px, 82vw);
+      background: var(--color-surface, white);
+      z-index: 31;
+      box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
       display: flex;
       flex-direction: column;
+      padding: 1.25rem 0.75rem;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.15rem;
-      padding: 0.5rem 0.25rem;
+      padding: 0 0.5rem 1rem;
+      border-bottom: 1px solid var(--color-border, #e6e3f1);
+      margin-bottom: 0.75rem;
+    }
+    .drawer-header span {
+      font-weight: 700;
+      color: var(--color-primary, #7c3aed);
+    }
+    .drawer-header button {
       border: none;
       background: none;
-      color: #6b7280;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-    nav button .icon {
       font-size: 1.2rem;
-      line-height: 1;
+      cursor: pointer;
+      color: var(--color-text-muted, #6b7280);
     }
-    nav button.active {
-      color: #2563eb;
+    .drawer nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .drawer nav button {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border: none;
+      background: none;
+      border-radius: var(--radius-sm, 8px);
+      font-size: 0.95rem;
+      color: var(--color-text, #1f2937);
+      cursor: pointer;
+      text-align: left;
+    }
+    .drawer nav button .icon {
+      font-size: 1.1rem;
+    }
+    .drawer nav button.active {
+      background: var(--color-primary-light, #f2ebfe);
+      color: var(--color-primary-dark, #6d28d9);
       font-weight: 600;
     }
-
-    @media (min-width: 720px) {
-      :host {
-        padding-bottom: 0;
-      }
-      nav {
-        position: static;
-        border-top: none;
-        border-bottom: 1px solid #e5e7eb;
-        justify-content: center;
-        gap: 0.5rem;
-      }
-      nav button {
-        flex: none;
-        flex-direction: row;
-        padding: 0.7rem 1rem;
-      }
+    .drawer-footer {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--color-border, #e6e3f1);
+    }
+    .drawer-footer button {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border, #e6e3f1);
+      border-radius: var(--radius-sm, 8px);
+      background: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--color-text, #1f2937);
     }
   `;
 
   @property({ attribute: false })
   member!: Member;
 
-  @state()
-  private tab: Tab = "events";
+  @state() private tab: Tab = "home";
+  @state() private drawerOpen = false;
+  @state() private selectedEvent: SportEvent | null = null;
+  @state() private selectedEventToken = 0;
 
   private get visibleTabs(): readonly TabDef[] {
     return TABS.filter((t) => t.visible(this.member));
   }
 
-  override render() {
-    const activeTab = this.visibleTabs.find((t) => t.id === this.tab) ?? this.visibleTabs[0];
+  private goTo(tab: Tab): void {
+    this.tab = tab;
+    this.drawerOpen = false;
+  }
 
+  private handleSelectEvent(event: SportEvent): void {
+    this.selectedEvent = event;
+    this.selectedEventToken += 1;
+    this.tab = "events";
+  }
+
+  private renderContent(): TemplateResult {
+    switch (this.tab) {
+      case "home":
+        return html`<home-view .member=${this.member} @select-event=${(e: CustomEvent<SportEvent>) => this.handleSelectEvent(e.detail)}></home-view>`;
+      case "events":
+        return html`<events-view
+          .member=${this.member}
+          .initialEvent=${this.selectedEvent}
+          .initialEventToken=${this.selectedEventToken}
+        ></events-view>`;
+      case "members":
+        return html`<admin-members-view></admin-members-view>`;
+      case "age-categories":
+        return html`<age-categories-view></age-categories-view>`;
+      case "event-references":
+        return html`<event-reference-admin-view></event-reference-admin-view>`;
+    }
+  }
+
+  override render() {
     return html`
       <header>
+        <button class="menu-toggle" @click=${() => (this.drawerOpen = true)} aria-label="Ouvrir le menu">☰</button>
+        <span class="title">DahultiApp</span>
         <span class="who">${this.member.firstName} ${this.member.lastName}</span>
-        <button @click=${() => signOut()}>Déconnexion</button>
       </header>
-      <main>${activeTab?.render(this.member)}</main>
-      <nav>
-        ${this.visibleTabs.map(
-          (t) => html`
-            <button class=${t.id === activeTab?.id ? "active" : ""} @click=${() => (this.tab = t.id)}>
-              <span class="icon">${t.icon}</span>
-              <span>${t.label}</span>
-            </button>
-          `,
-        )}
-      </nav>
+
+      <main>${this.renderContent()}</main>
+
+      ${this.drawerOpen
+        ? html`
+            <div class="backdrop" @click=${() => (this.drawerOpen = false)}></div>
+            <div class="drawer">
+              <div class="drawer-header">
+                <span>DahultiApp</span>
+                <button @click=${() => (this.drawerOpen = false)} aria-label="Fermer le menu">✕</button>
+              </div>
+              <nav>
+                ${this.visibleTabs.map(
+                  (t) => html`
+                    <button class=${this.tab === t.id ? "active" : ""} @click=${() => this.goTo(t.id)}>
+                      <span class="icon">${t.icon}</span>
+                      <span>${t.label}</span>
+                    </button>
+                  `,
+                )}
+              </nav>
+              <div class="drawer-footer">
+                <button @click=${() => signOut()}>Déconnexion</button>
+              </div>
+            </div>
+          `
+        : ""}
     `;
   }
 }

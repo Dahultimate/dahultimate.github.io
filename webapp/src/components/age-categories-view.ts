@@ -58,7 +58,7 @@ export class AgeCategoriesView extends LitElement {
       padding: 0.5rem 0.9rem;
       border: none;
       border-radius: 8px;
-      background: #2563eb;
+      background: var(--color-primary, #7c3aed);
       color: white;
       font-size: 0.9rem;
     }

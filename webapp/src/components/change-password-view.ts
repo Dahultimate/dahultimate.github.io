@@ -47,13 +47,13 @@ export class ChangePasswordView extends LitElement {
       padding: 0.7rem;
       border: none;
       border-radius: 8px;
-      background: #2563eb;
+      background: var(--color-primary, #7c3aed);
       color: white;
       font-size: 1rem;
       cursor: pointer;
     }
     button:disabled {
-      background: #93c5fd;
+      background: #c4b5fd;
       cursor: not-allowed;
     }
     .error {

@@ -1,5 +1,5 @@
 import { computeAgeCategory, type AgeCategory } from "./age-category";
-import type { AllowedCategory } from "./event";
+import type { AllowedCategory, SportEvent } from "./event";
 import type { MemberDirectoryEntry } from "./member";
 import type { AvailabilityStatus } from "./availability";
 
@@ -45,6 +45,27 @@ export function evaluateParticipants(
       return { member, status: "not-concerned" };
     }
     return { member, status: availabilityByMemberId.get(member.id) ?? "no-response" };
+  });
+}
+
+/**
+ * Événements pour lesquels le membre est concerné, n'a pas encore répondu,
+ * et dont la date butoir n'est pas dépassée — utilisé par la page d'accueil.
+ */
+export function findUnansweredEvents(
+  events: readonly SportEvent[],
+  member: Pick<MemberDirectoryEntry, "sex" | "birthYear">,
+  ageCategories: readonly AgeCategory[],
+  respondedEventIds: ReadonlySet<string>,
+  today: string = new Date().toISOString().slice(0, 10),
+): SportEvent[] {
+  const category = computeAgeCategory(ageCategories, member.sex, member.birthYear);
+  if (!category) return [];
+
+  return events.filter((event) => {
+    if (respondedEventIds.has(event.id)) return false;
+    if (event.responseDeadline < today) return false;
+    return event.allowedCategories.some((c) => c.sex === member.sex && c.ageCategoryId === category.id);
   });
 }
 

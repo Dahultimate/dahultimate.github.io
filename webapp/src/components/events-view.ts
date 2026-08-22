@@ -1,8 +1,8 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { SportEvent } from "../domain/event";
 import type { Member } from "../domain/member";
-import "./event-family-list";
+import "./events-browser";
 import "./event-detail";
 import "./event-form";
 
@@ -28,8 +28,8 @@ export class EventsView extends LitElement {
     button {
       padding: 0.5rem 0.9rem;
       border: none;
-      border-radius: 8px;
-      background: #2563eb;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary, var(--color-primary, #7c3aed));
       color: white;
       font-size: 0.9rem;
       cursor: pointer;
@@ -37,6 +37,10 @@ export class EventsView extends LitElement {
   `;
 
   @property({ attribute: false }) member!: Member;
+
+  /** Sélection imposée par un autre écran (ex : page d'accueil). */
+  @property({ attribute: false }) initialEvent: SportEvent | null = null;
+  @property({ type: Number }) initialEventToken = 0;
 
   @state() private view: ViewMode = { mode: "lists" };
   @state() private listRefreshToken = 0;
@@ -48,6 +52,16 @@ export class EventsView extends LitElement {
   private goToLists(): void {
     this.view = { mode: "lists" };
     this.listRefreshToken += 1;
+  }
+
+  override willUpdate(changed: PropertyValues<this>): void {
+    // Contrairement au pattern "refreshToken" (qui ignore volontairement le
+    // premier rendu), ce token doit déclencher le saut vers le détail dès
+    // le tout premier montage : c'est justement le cas d'usage principal
+    // (arrivée depuis l'accueil sur un events-view fraîchement créé).
+    if (changed.has("initialEventToken") && this.initialEvent) {
+      this.view = { mode: "detail", event: this.initialEvent };
+    }
   }
 
   override render() {
@@ -73,18 +87,10 @@ export class EventsView extends LitElement {
         <h2>Événements</h2>
         ${this.canManage ? html`<button @click=${() => (this.view = { mode: "create" })}>+ Créer un événement</button>` : ""}
       </header>
-      <event-family-list
-        family="sportif"
-        heading="Événements sportifs"
+      <events-browser
         .refreshToken=${this.listRefreshToken}
         @select=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "detail", event: e.detail })}
-      ></event-family-list>
-      <event-family-list
-        family="tournoi"
-        heading="Tournois et Hats"
-        .refreshToken=${this.listRefreshToken}
-        @select=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "detail", event: e.detail })}
-      ></event-family-list>
+      ></events-browser>
     `;
   }
 }

@@ -56,11 +56,11 @@ export class MemberForm extends LitElement {
     }
     button[type="submit"] {
       border: none;
-      background: #2563eb;
+      background: var(--color-primary, #7c3aed);
       color: white;
     }
     button[type="submit"]:disabled {
-      background: #93c5fd;
+      background: #c4b5fd;
       cursor: not-allowed;
     }
     button[type="button"] {

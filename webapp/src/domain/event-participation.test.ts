@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { evaluateParticipants, summarizeParticipants } from "./event-participation";
+import { evaluateParticipants, findUnansweredEvents, summarizeParticipants } from "./event-participation";
 import type { AgeCategory } from "./age-category";
 import type { MemberDirectoryEntry } from "./member";
-import type { AllowedCategory } from "./event";
+import type { AllowedCategory, SportEvent } from "./event";
 
 const AGE_CATEGORIES: AgeCategory[] = [
   { id: "f-senior", sex: "F", label: "Sénior", minBirthYear: 1998, maxBirthYear: 2007, sortOrder: 0 },
@@ -65,5 +65,50 @@ describe("evaluateParticipants / summarizeParticipants", () => {
       unavailable: 1,
       totalResponses: 3,
     });
+  });
+});
+
+function event(id: string, deadline: string, allowedCategories: AllowedCategory[]): SportEvent {
+  return {
+    id,
+    eventTypeId: "type-1",
+    category: "Mixte",
+    formatId: "format-1",
+    divisionId: "division-1",
+    location: "Annecy",
+    eventDate: "2030-06-15",
+    organizerId: "organizer-1",
+    responseDeadline: deadline,
+    allowedCategories,
+  };
+}
+
+describe("findUnansweredEvents", () => {
+  const me = { sex: "F" as const, birthYear: 2000 }; // Sénior F
+  const allowedForMe: AllowedCategory[] = [{ sex: "F", ageCategoryId: "f-senior" }];
+  const allowedForOthers: AllowedCategory[] = [{ sex: "M", ageCategoryId: "m-senior" }];
+
+  it("inclut un événement concerné, futur, sans réponse", () => {
+    const events = [event("e1", "2030-01-01", allowedForMe)];
+    const result = findUnansweredEvents(events, me, AGE_CATEGORIES, new Set(), "2029-12-01");
+    expect(result.map((e) => e.id)).toEqual(["e1"]);
+  });
+
+  it("exclut un événement déjà répondu", () => {
+    const events = [event("e1", "2030-01-01", allowedForMe)];
+    const result = findUnansweredEvents(events, me, AGE_CATEGORIES, new Set(["e1"]), "2029-12-01");
+    expect(result).toEqual([]);
+  });
+
+  it("exclut un événement dont la date butoir est dépassée", () => {
+    const events = [event("e1", "2029-01-01", allowedForMe)];
+    const result = findUnansweredEvents(events, me, AGE_CATEGORIES, new Set(), "2029-12-01");
+    expect(result).toEqual([]);
+  });
+
+  it("exclut un événement pour lequel le membre n'est pas concerné", () => {
+    const events = [event("e1", "2030-01-01", allowedForOthers)];
+    const result = findUnansweredEvents(events, me, AGE_CATEGORIES, new Set(), "2029-12-01");
+    expect(result).toEqual([]);
   });
 });

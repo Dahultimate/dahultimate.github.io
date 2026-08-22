@@ -100,7 +100,7 @@ export class EventDetail extends LitElement {
     }
     button.primary {
       border: none;
-      background: #2563eb;
+      background: var(--color-primary, #7c3aed);
       color: white;
     }
     .actions {

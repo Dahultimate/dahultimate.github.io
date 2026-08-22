@@ -13,55 +13,116 @@ export class MembersList extends LitElement {
       display: block;
       font-family: system-ui, sans-serif;
     }
-    .table-scroll {
-      overflow-x: auto;
-    }
-    table {
+    input[type="search"] {
+      box-sizing: border-box;
       width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
+      padding: 0.6rem 0.85rem;
+      border: 1px solid var(--color-border, #e6e3f1);
+      border-radius: var(--radius-md, 12px);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
     }
-    th,
-    td {
-      text-align: left;
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: middle;
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
     }
-    tr.inactive {
-      color: #9ca3af;
+    .card {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      border: 1px solid var(--color-border, #e6e3f1);
+      border-radius: var(--radius-md, 12px);
+      background: var(--color-surface, white);
+      box-shadow: var(--shadow-sm, none);
+      padding: 0.85rem 1rem;
+    }
+    .card.inactive {
+      opacity: 0.6;
+    }
+    .identity .name {
+      font-weight: 600;
+      color: var(--color-text, #1f2937);
+    }
+    .identity .details {
+      font-size: 0.82rem;
+      color: var(--color-text-muted, #6b7280);
+      margin-top: 0.15rem;
+      line-height: 1.5;
+    }
+    .badges {
+      margin-top: 0.35rem;
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
     }
     .badge {
       display: inline-block;
       padding: 0.1rem 0.5rem;
       border-radius: 999px;
-      font-size: 0.75rem;
-      margin-right: 0.25rem;
+      font-size: 0.72rem;
     }
     .badge.admin {
-      background: #ede9fe;
-      color: #5b21b6;
+      background: var(--color-primary-light, #ede9fe);
+      color: var(--color-primary-dark, #5b21b6);
     }
     .badge.coach {
-      background: #dbeafe;
+      background: var(--color-info-bg, #dbeafe);
       color: #1e40af;
     }
-    .actions {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
+    .badge.inactive-badge {
+      background: #f3f4f6;
+      color: #6b7280;
     }
-    button {
-      padding: 0.3rem 0.6rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      background: white;
-      font-size: 0.8rem;
+    .menu-wrapper {
+      position: relative;
+    }
+    .menu-button {
+      border: none;
+      background: none;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 0.25rem 0.5rem;
       cursor: pointer;
+      color: var(--color-text-muted, #6b7280);
+      border-radius: 6px;
     }
-    button.danger {
-      border-color: #fca5a5;
-      color: #991b1b;
+    .menu-button:hover {
+      background: #f3f4f6;
+    }
+    .menu {
+      position: absolute;
+      right: 0;
+      top: 2rem;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      min-width: 180px;
+      background: var(--color-surface, white);
+      border: 1px solid var(--color-border, #e6e3f1);
+      border-radius: var(--radius-sm, 8px);
+      box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
+      overflow: hidden;
+    }
+    .menu button {
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 0.55rem 0.85rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--color-text, #1f2937);
+    }
+    .menu button:hover {
+      background: #f7f6fb;
+    }
+    .menu button.danger {
+      color: var(--color-danger, #991b1b);
     }
     .error {
       color: #991b1b;
@@ -70,6 +131,10 @@ export class MembersList extends LitElement {
       border-radius: 8px;
       font-size: 0.85rem;
       margin-bottom: 0.75rem;
+    }
+    .empty {
+      color: var(--color-text-muted, #6b7280);
+      font-size: 0.9rem;
     }
   `;
 
@@ -81,6 +146,8 @@ export class MembersList extends LitElement {
   @state() private ageCategories: AgeCategory[] = [];
   @state() private loading = true;
   @state() private errorMessage: string | null = null;
+  @state() private search = "";
+  @state() private openMenuId: string | null = null;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -101,7 +168,31 @@ export class MembersList extends LitElement {
     this.loading = false;
   }
 
+  private categoryLabel(member: Member): string {
+    return computeAgeCategory(this.ageCategories, member.sex, member.birthYear)?.label ?? "—";
+  }
+
+  private get filteredMembers(): Member[] {
+    const search = this.search.trim().toLowerCase();
+    if (!search) return this.members;
+    return this.members.filter((member) => {
+      const rights = [member.isAdmin ? "admin" : "", member.isCoach ? "coach" : "", member.active ? "actif" : "inactif"].join(" ");
+      const haystack = [
+        member.firstName,
+        member.lastName,
+        member.email,
+        member.licenseNumber,
+        this.categoryLabel(member),
+        rights,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(search);
+    });
+  }
+
   private async handleToggleActive(member: Member): Promise<void> {
+    this.openMenuId = null;
     this.errorMessage = null;
     const result = await updateMember(member.id, { ...member, active: !member.active });
     if (result) {
@@ -112,6 +203,7 @@ export class MembersList extends LitElement {
   }
 
   private async handleResetPassword(member: Member): Promise<void> {
+    this.openMenuId = null;
     const confirmed = confirm(
       `Réinitialiser le mot de passe de ${member.firstName} ${member.lastName} à son numéro de licence (${member.licenseNumber}) ?`,
     );
@@ -126,6 +218,7 @@ export class MembersList extends LitElement {
   }
 
   private async handleDelete(member: Member): Promise<void> {
+    this.openMenuId = null;
     const confirmed = confirm(
       `Supprimer définitivement le compte de ${member.firstName} ${member.lastName} ? Cette action est irréversible.`,
     );
@@ -140,53 +233,70 @@ export class MembersList extends LitElement {
   }
 
   private handleEdit(member: Member): void {
+    this.openMenuId = null;
     this.dispatchEvent(new CustomEvent<Member>("edit", { detail: member, bubbles: true, composed: true }));
+  }
+
+  private toggleMenu(memberId: string): void {
+    this.openMenuId = this.openMenuId === memberId ? null : memberId;
+  }
+
+  private renderMenu(member: Member) {
+    if (this.openMenuId !== member.id) return "";
+    return html`
+      <div class="menu">
+        <button @click=${() => this.handleEdit(member)}>Modifier</button>
+        <button @click=${() => this.handleToggleActive(member)}>${member.active ? "Désactiver" : "Réactiver"}</button>
+        <button @click=${() => this.handleResetPassword(member)}>Réinitialiser le mot de passe</button>
+        <button class="danger" @click=${() => this.handleDelete(member)}>Supprimer</button>
+      </div>
+    `;
   }
 
   override render() {
     if (this.loading) return html`<p>Chargement…</p>`;
 
+    const members = this.filteredMembers;
+
     return html`
       ${this.errorMessage ? html`<p class="error">${this.errorMessage}</p>` : ""}
-      <div class="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>Membre</th>
-            <th>Email</th>
-            <th>Licence</th>
-            <th>Catégorie</th>
-            <th>Droits</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.members.map(
-            (member) => html`
-              <tr class=${member.active ? "" : "inactive"}>
-                <td>${member.firstName} ${member.lastName}</td>
-                <td>${member.email}</td>
-                <td>${member.licenseNumber} (${member.licenseType === "competition" ? "compétition" : "loisir"})</td>
-                <td>${computeAgeCategory(this.ageCategories, member.sex, member.birthYear)?.label ?? "—"}</td>
-                <td>
-                  ${member.isAdmin ? html`<span class="badge admin">Admin</span>` : ""}
-                  ${member.isCoach ? html`<span class="badge coach">Coach</span>` : ""}
-                  ${!member.active ? html`<span class="badge">Inactif</span>` : ""}
-                </td>
-                <td class="actions">
-                  <button @click=${() => this.handleEdit(member)}>Modifier</button>
-                  <button @click=${() => this.handleToggleActive(member)}>
-                    ${member.active ? "Désactiver" : "Réactiver"}
-                  </button>
-                  <button @click=${() => this.handleResetPassword(member)}>Réinitialiser mdp</button>
-                  <button class="danger" @click=${() => this.handleDelete(member)}>Supprimer</button>
-                </td>
-              </tr>
-            `,
-          )}
-        </tbody>
-      </table>
-      </div>
+      <input
+        type="search"
+        placeholder="Rechercher (nom, email, licence, catégorie, droits)…"
+        .value=${this.search}
+        @input=${(e: Event) => (this.search = (e.target as HTMLInputElement).value)}
+      />
+      ${members.length === 0
+        ? html`<p class="empty">Aucun membre ne correspond.</p>`
+        : html`
+            <ul>
+              ${members.map(
+                (member) => html`
+                  <li>
+                    <div class="card ${member.active ? "" : "inactive"}">
+                      <div class="identity">
+                        <div class="name">${member.firstName} ${member.lastName}</div>
+                        <div class="details">
+                          ${member.email}<br />
+                          Licence ${member.licenseNumber} (${member.licenseType === "competition" ? "compétition" : "loisir"})
+                          · ${this.categoryLabel(member)}
+                        </div>
+                        <div class="badges">
+                          ${member.isAdmin ? html`<span class="badge admin">Admin</span>` : ""}
+                          ${member.isCoach ? html`<span class="badge coach">Coach</span>` : ""}
+                          ${!member.active ? html`<span class="badge inactive-badge">Inactif</span>` : ""}
+                        </div>
+                      </div>
+                      <div class="menu-wrapper">
+                        <button class="menu-button" @click=${() => this.toggleMenu(member.id)} aria-label="Actions">⋮</button>
+                        ${this.renderMenu(member)}
+                      </div>
+                    </div>
+                  </li>
+                `,
+              )}
+            </ul>
+          `}
     `;
   }
 }

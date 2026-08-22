@@ -16,6 +16,17 @@ export async function fetchAvailabilitiesForEvent(eventId: string): Promise<Map<
   return new Map((data as AvailabilityRow[]).map((row) => [row.member_id, row.status]));
 }
 
+/** Ids des événements pour lesquels le membre courant a déjà répondu (page d'accueil). */
+export async function fetchOwnRespondedEventIds(): Promise<Set<string>> {
+  const { data: userData } = await supabase.auth.getUser();
+  const memberId = userData.user?.id;
+  if (!memberId) return new Set();
+
+  const { data, error } = await supabase.from("availabilities").select("event_id").eq("member_id", memberId);
+  if (error || !data) return new Set();
+  return new Set((data as { event_id: string }[]).map((row) => row.event_id));
+}
+
 /**
  * Déclare/modifie la disponibilité du membre courant pour un événement.
  * Réservé à sa propre ligne, avant la date butoir (RLS
