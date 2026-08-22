@@ -1,7 +1,9 @@
 import { LitElement, css, html, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { fetchAllMembers } from "../services/members.repository";
+import { fetchAgeCategories } from "../services/age-categories.repository";
 import { deleteMember, resetMemberPassword, updateMember } from "../services/admin-members.service";
+import { computeAgeCategory, type AgeCategory } from "../domain/age-category";
 import type { Member } from "../domain/member";
 
 @customElement("members-list")
@@ -73,6 +75,7 @@ export class MembersList extends LitElement {
   refreshToken = 0;
 
   @state() private members: Member[] = [];
+  @state() private ageCategories: AgeCategory[] = [];
   @state() private loading = true;
   @state() private errorMessage: string | null = null;
 
@@ -89,7 +92,9 @@ export class MembersList extends LitElement {
 
   private async refresh(): Promise<void> {
     this.loading = true;
-    this.members = await fetchAllMembers();
+    const [members, ageCategories] = await Promise.all([fetchAllMembers(), fetchAgeCategories()]);
+    this.members = members;
+    this.ageCategories = ageCategories;
     this.loading = false;
   }
 
@@ -146,6 +151,7 @@ export class MembersList extends LitElement {
             <th>Membre</th>
             <th>Email</th>
             <th>Licence</th>
+            <th>Catégorie</th>
             <th>Droits</th>
             <th>Actions</th>
           </tr>
@@ -157,6 +163,7 @@ export class MembersList extends LitElement {
                 <td>${member.firstName} ${member.lastName}</td>
                 <td>${member.email}</td>
                 <td>${member.licenseNumber} (${member.licenseType === "competition" ? "compétition" : "loisir"})</td>
+                <td>${computeAgeCategory(this.ageCategories, member.sex, member.birthYear)?.label ?? "—"}</td>
                 <td>
                   ${member.isAdmin ? html`<span class="badge admin">Admin</span>` : ""}
                   ${member.isCoach ? html`<span class="badge coach">Coach</span>` : ""}

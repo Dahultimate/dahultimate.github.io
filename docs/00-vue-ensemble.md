@@ -28,8 +28,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 |---|---|---|
 | 0 | Socle technique & pipeline de déploiement | ✅ Validé |
 | 1 | Authentification & connexion | ✅ Validé |
-| 2 | Gestion des membres (admin) | 🔧 En cours |
-| 3 | Catégories d'âge | ⏳ À venir |
+| 2 | Gestion des membres (admin) | ✅ Validé |
+| 3 | Catégories d'âge | 🔧 En cours |
 | 4 | Référentiels d'événements (admin) | ⏳ À venir |
 | 5 | Création & modification d'événements | ⏳ À venir |
 | 6 | Consultation des événements | ⏳ À venir |

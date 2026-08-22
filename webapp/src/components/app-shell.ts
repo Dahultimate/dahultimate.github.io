@@ -3,8 +3,9 @@ import { customElement, property, state } from "lit/decorators.js";
 import { signOut } from "../services/auth.service";
 import type { Member } from "../domain/member";
 import "./admin-members-view";
+import "./age-categories-view";
 
-type Tab = "home" | "members";
+type Tab = "home" | "members" | "age-categories";
 
 @customElement("app-shell")
 export class AppShell extends LitElement {
@@ -72,11 +73,21 @@ export class AppShell extends LitElement {
               Membres
             </button>`
           : ""}
+        ${this.member.isAdmin
+          ? html`<button
+              class=${this.tab === "age-categories" ? "active" : ""}
+              @click=${() => (this.tab = "age-categories")}
+            >
+              Catégories d'âge
+            </button>`
+          : ""}
       </nav>
       <main>
         ${this.tab === "members" && this.member.isAdmin
           ? html`<admin-members-view></admin-members-view>`
-          : html`<p>Connecté avec succès. Le contenu de l'application sera ajouté au fil des prochaines phases.</p>`}
+          : this.tab === "age-categories" && this.member.isAdmin
+            ? html`<age-categories-view></age-categories-view>`
+            : html`<p>Connecté avec succès. Le contenu de l'application sera ajouté au fil des prochaines phases.</p>`}
       </main>
     `;
   }
