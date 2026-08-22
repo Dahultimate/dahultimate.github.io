@@ -1,11 +1,40 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { signOut } from "../services/auth.service";
 import type { Member } from "../domain/member";
 import "./admin-members-view";
 import "./age-categories-view";
+import "./event-reference-admin-view";
 
-type Tab = "home" | "members" | "age-categories";
+type Tab = "home" | "members" | "age-categories" | "event-references";
+
+interface TabDef {
+  id: Tab;
+  label: string;
+  adminOnly: boolean;
+  render: () => TemplateResult;
+}
+
+const TABS: readonly TabDef[] = [
+  {
+    id: "members",
+    label: "Membres",
+    adminOnly: true,
+    render: () => html`<admin-members-view></admin-members-view>`,
+  },
+  {
+    id: "age-categories",
+    label: "Catégories d'âge",
+    adminOnly: true,
+    render: () => html`<age-categories-view></age-categories-view>`,
+  },
+  {
+    id: "event-references",
+    label: "Référentiels événements",
+    adminOnly: true,
+    render: () => html`<event-reference-admin-view></event-reference-admin-view>`,
+  },
+];
 
 @customElement("app-shell")
 export class AppShell extends LitElement {
@@ -36,6 +65,7 @@ export class AppShell extends LitElement {
     nav {
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
       padding: 0.75rem 1.5rem;
       border-bottom: 1px solid #e5e7eb;
     }
@@ -60,7 +90,13 @@ export class AppShell extends LitElement {
   @state()
   private tab: Tab = "home";
 
+  private get visibleTabs(): readonly TabDef[] {
+    return TABS.filter((t) => !t.adminOnly || this.member.isAdmin);
+  }
+
   override render() {
+    const activeTab = this.visibleTabs.find((t) => t.id === this.tab);
+
     return html`
       <header>
         <span class="who">${this.member.firstName} ${this.member.lastName}</span>
@@ -68,26 +104,16 @@ export class AppShell extends LitElement {
       </header>
       <nav>
         <button class=${this.tab === "home" ? "active" : ""} @click=${() => (this.tab = "home")}>Accueil</button>
-        ${this.member.isAdmin
-          ? html`<button class=${this.tab === "members" ? "active" : ""} @click=${() => (this.tab = "members")}>
-              Membres
-            </button>`
-          : ""}
-        ${this.member.isAdmin
-          ? html`<button
-              class=${this.tab === "age-categories" ? "active" : ""}
-              @click=${() => (this.tab = "age-categories")}
-            >
-              Catégories d'âge
-            </button>`
-          : ""}
+        ${this.visibleTabs.map(
+          (t) => html`
+            <button class=${this.tab === t.id ? "active" : ""} @click=${() => (this.tab = t.id)}>${t.label}</button>
+          `,
+        )}
       </nav>
       <main>
-        ${this.tab === "members" && this.member.isAdmin
-          ? html`<admin-members-view></admin-members-view>`
-          : this.tab === "age-categories" && this.member.isAdmin
-            ? html`<age-categories-view></age-categories-view>`
-            : html`<p>Connecté avec succès. Le contenu de l'application sera ajouté au fil des prochaines phases.</p>`}
+        ${activeTab
+          ? activeTab.render()
+          : html`<p>Connecté avec succès. Le contenu de l'application sera ajouté au fil des prochaines phases.</p>`}
       </main>
     `;
   }
