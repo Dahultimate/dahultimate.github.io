@@ -1,13 +1,24 @@
-import { LitElement, css, html, type PropertyValues } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { LitElement, css, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import type { SportEvent } from "../domain/event";
 import type { Member } from "../domain/member";
 import "./events-browser";
 import "./event-detail";
 import "./event-form";
 
-type ViewMode = { mode: "lists" } | { mode: "detail"; event: SportEvent } | { mode: "create" } | { mode: "edit"; event: SportEvent };
+export type EventsSubView =
+  | { mode: "list" }
+  | { mode: "detail"; event: SportEvent }
+  | { mode: "create" }
+  | { mode: "edit"; event: SportEvent };
 
+/**
+ * Composant "contrôlé" : ne possède plus son propre état de navigation.
+ * L'écran courant (`view`) est imposé par le parent (app-shell), qui
+ * synchronise la navigation Événements avec l'historique du navigateur
+ * (bouton Retour) — voir app-shell.ts. Ce composant se contente de
+ * signaler les intentions de navigation via des événements.
+ */
 @customElement("events-view")
 export class EventsView extends LitElement {
   static override styles = css`
@@ -29,7 +40,7 @@ export class EventsView extends LitElement {
       padding: 0.5rem 0.9rem;
       border: none;
       border-radius: var(--radius-md, 8px);
-      background: var(--color-primary, var(--color-primary, #7c3aed));
+      background: var(--color-primary, #7c3aed);
       color: white;
       font-size: 0.9rem;
       cursor: pointer;
@@ -37,47 +48,31 @@ export class EventsView extends LitElement {
   `;
 
   @property({ attribute: false }) member!: Member;
-
-  /** Sélection imposée par un autre écran (ex : page d'accueil). */
-  @property({ attribute: false }) initialEvent: SportEvent | null = null;
-  @property({ type: Number }) initialEventToken = 0;
-
-  @state() private view: ViewMode = { mode: "lists" };
-  @state() private listRefreshToken = 0;
+  @property({ attribute: false }) view: EventsSubView = { mode: "list" };
+  @property({ type: Number }) listRefreshToken = 0;
 
   private get canManage(): boolean {
     return this.member.isAdmin;
   }
 
-  private goToLists(): void {
-    this.view = { mode: "lists" };
-    this.listRefreshToken += 1;
-  }
-
-  override willUpdate(changed: PropertyValues<this>): void {
-    // Contrairement au pattern "refreshToken" (qui ignore volontairement le
-    // premier rendu), ce token doit déclencher le saut vers le détail dès
-    // le tout premier montage : c'est justement le cas d'usage principal
-    // (arrivée depuis l'accueil sur un events-view fraîchement créé).
-    if (changed.has("initialEventToken") && this.initialEvent) {
-      this.view = { mode: "detail", event: this.initialEvent };
-    }
+  private emit(name: string, detail?: unknown): void {
+    this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
   }
 
   override render() {
-    if (this.view.mode !== "lists") {
+    if (this.view.mode !== "list") {
       return html`
         ${this.view.mode === "detail"
           ? html`<event-detail
               .event=${this.view.event}
               .member=${this.member}
-              @back=${() => this.goToLists()}
-              @edit=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "edit", event: e.detail })}
+              @back=${() => this.emit("back-to-list")}
+              @edit=${(e: CustomEvent<SportEvent>) => this.emit("edit-event", e.detail)}
             ></event-detail>`
           : html`<event-form
               .event=${this.view.mode === "edit" ? this.view.event : null}
-              @saved=${() => this.goToLists()}
-              @cancel=${() => this.goToLists()}
+              @saved=${() => this.emit("saved")}
+              @cancel=${() => this.emit("back-to-list")}
             ></event-form>`}
       `;
     }
@@ -85,11 +80,11 @@ export class EventsView extends LitElement {
     return html`
       <header>
         <h2>Événements</h2>
-        ${this.canManage ? html`<button @click=${() => (this.view = { mode: "create" })}>+ Créer un événement</button>` : ""}
+        ${this.canManage ? html`<button @click=${() => this.emit("create-event")}>+ Créer un événement</button>` : ""}
       </header>
       <events-browser
         .refreshToken=${this.listRefreshToken}
-        @select=${(e: CustomEvent<SportEvent>) => (this.view = { mode: "detail", event: e.detail })}
+        @select=${(e: CustomEvent<SportEvent>) => this.emit("select-event", e.detail)}
       ></events-browser>
     `;
   }

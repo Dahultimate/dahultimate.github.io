@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { signOut } from "../services/auth.service";
 import type { Member } from "../domain/member";
 import type { SportEvent } from "../domain/event";
+import type { EventsSubView } from "./events-view";
 import "./home-view";
 import "./admin-members-view";
 import "./age-categories-view";
@@ -10,6 +11,22 @@ import "./event-reference-admin-view";
 import "./events-view";
 
 type Tab = "home" | "members" | "age-categories" | "event-references" | "events";
+
+/**
+ * État complet de navigation, synchronisé avec l'historique du navigateur
+ * (history.pushState / popstate) pour que le bouton Retour navigue dans
+ * l'app plutôt que de la quitter. Un objet JSON simple (événements inclus,
+ * ce sont de simples littéraux) tient directement dans history.state, pas
+ * besoin de l'encoder dans l'URL.
+ */
+interface NavState {
+  tab: Tab;
+  eventsView: EventsSubView;
+}
+
+function defaultNavState(): NavState {
+  return { tab: "home", eventsView: { mode: "list" } };
+}
 
 interface TabDef {
   id: Tab;
@@ -162,39 +179,69 @@ export class AppShell extends LitElement {
   @property({ attribute: false })
   member!: Member;
 
-  @state() private tab: Tab = "home";
+  @state() private nav: NavState = defaultNavState();
   @state() private drawerOpen = false;
-  @state() private selectedEvent: SportEvent | null = null;
-  @state() private selectedEventToken = 0;
+  @state() private eventsListRefreshToken = 0;
+
+  private readonly handlePopState = (e: PopStateEvent): void => {
+    this.nav = (e.state as NavState | null) ?? defaultNavState();
+  };
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    window.addEventListener("popstate", this.handlePopState);
+    // Pose une première entrée d'historique pour l'état de départ : sans
+    // ça, le tout premier appui sur Retour n'a rien à "dépiler" et quitte
+    // directement l'application.
+    history.replaceState(this.nav, "");
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    window.removeEventListener("popstate", this.handlePopState);
+  }
+
+  /** Toute navigation (onglet, écran Événements) passe par ici pour rester synchronisée avec l'historique du navigateur. */
+  private navigate(nav: NavState): void {
+    this.nav = nav;
+    history.pushState(nav, "");
+  }
 
   private get visibleTabs(): readonly TabDef[] {
     return TABS.filter((t) => t.visible(this.member));
   }
 
   private goTo(tab: Tab): void {
-    // Navigation "normale" (menu) : on efface une éventuelle sélection
-    // d'événement laissée par un clic depuis l'Accueil, sinon un simple
-    // retour sur "Événements" rouvrirait ce même événement à chaque fois.
-    this.selectedEvent = null;
-    this.tab = tab;
+    // Navigation "normale" (menu) : on repart sur la liste des événements,
+    // sinon revenir sur "Événements" pourrait rouvrir un ancien détail.
+    this.navigate({ tab, eventsView: { mode: "list" } });
     this.drawerOpen = false;
   }
 
-  private handleSelectEvent(event: SportEvent): void {
-    this.selectedEvent = event;
-    this.selectedEventToken += 1;
-    this.tab = "events";
+  private goToEventsView(eventsView: EventsSubView): void {
+    this.navigate({ tab: "events", eventsView });
   }
 
   private renderContent(): TemplateResult {
-    switch (this.tab) {
+    switch (this.nav.tab) {
       case "home":
-        return html`<home-view .member=${this.member} @select-event=${(e: CustomEvent<SportEvent>) => this.handleSelectEvent(e.detail)}></home-view>`;
+        return html`<home-view
+          .member=${this.member}
+          @select-event=${(e: CustomEvent<SportEvent>) => this.goToEventsView({ mode: "detail", event: e.detail })}
+        ></home-view>`;
       case "events":
         return html`<events-view
           .member=${this.member}
-          .initialEvent=${this.selectedEvent}
-          .initialEventToken=${this.selectedEventToken}
+          .view=${this.nav.eventsView}
+          .listRefreshToken=${this.eventsListRefreshToken}
+          @select-event=${(e: CustomEvent<SportEvent>) => this.goToEventsView({ mode: "detail", event: e.detail })}
+          @create-event=${() => this.goToEventsView({ mode: "create" })}
+          @edit-event=${(e: CustomEvent<SportEvent>) => this.goToEventsView({ mode: "edit", event: e.detail })}
+          @back-to-list=${() => this.goToEventsView({ mode: "list" })}
+          @saved=${() => {
+            this.eventsListRefreshToken += 1;
+            this.goToEventsView({ mode: "list" });
+          }}
         ></events-view>`;
       case "members":
         return html`<admin-members-view></admin-members-view>`;
@@ -226,7 +273,7 @@ export class AppShell extends LitElement {
               <nav>
                 ${this.visibleTabs.map(
                   (t) => html`
-                    <button class=${this.tab === t.id ? "active" : ""} @click=${() => this.goTo(t.id)}>
+                    <button class=${this.nav.tab === t.id ? "active" : ""} @click=${() => this.goTo(t.id)}>
                       <span class="icon">${t.icon}</span>
                       <span>${t.label}</span>
                     </button>

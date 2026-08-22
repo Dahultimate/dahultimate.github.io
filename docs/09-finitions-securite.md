@@ -26,6 +26,11 @@ Dernière phase avant le déploiement : revoir le design général (épuré, col
 ### Page Membres
 - `components/members-list.ts` réécrit : cartes (plus de tableau, donc plus de défilement horizontal), actions regroupées dans un menu "⋮" par ligne (Modifier / Désactiver-Réactiver / Réinitialiser le mot de passe / Supprimer), et un champ de recherche (nom, prénom, email, n° de licence, catégorie d'âge, droits).
 
+### Bouton "Retour" du navigateur
+Corrigé après coup : aucune navigation dans l'app ne créait d'entrée dans l'historique du navigateur, donc "Retour" quittait directement l'application. `components/app-shell.ts` centralise maintenant tout l'état de navigation (onglet + écran Événements — liste/détail/création/édition) dans un seul objet `NavState`, synchronisé avec `history.pushState`/`popstate` : chaque navigation (changement d'onglet, ouverture d'un événement, création/modification) pousse une entrée d'historique, et "Retour" restaure l'écran précédent au lieu de sortir de l'app. `components/events-view.ts` est devenu un composant "contrôlé" : il ne possède plus son propre état, il signale ses intentions de navigation (`select-event`, `create-event`, `edit-event`, `back-to-list`, `saved`) à `app-shell` qui décide et pousse l'historique.
+
+**Portée volontairement limitée** : seuls les onglets et l'écran Événements (le parcours le plus profond) sont couverts. Les sous-écrans admin (liste/formulaire dans Membres, Catégories d'âge, Référentiels) gèrent encore leur propre état localement et ne sont pas couverts par cette correction — à étendre si besoin.
+
 ### Corrections responsive restantes
 - `box-sizing: border-box` + largeur 100% ajoutés aux champs de `login-view`, `change-password-view`, `member-form`, `age-category-form`, `event-reference-form`.
 - Les tableaux restants (`event-reference-list`, `age-categories-view` — listes courtes, pas concernées par la refonte en cartes) sont enveloppés dans un conteneur `overflow-x: auto` par précaution.
