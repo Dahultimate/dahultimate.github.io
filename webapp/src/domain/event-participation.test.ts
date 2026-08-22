@@ -71,12 +71,14 @@ describe("evaluateParticipants / summarizeParticipants", () => {
 function event(id: string, deadline: string, allowedCategories: AllowedCategory[]): SportEvent {
   return {
     id,
+    name: "Événement de test",
     eventTypeId: "type-1",
     category: "Mixte",
     formatId: "format-1",
     divisionId: "division-1",
     location: "Annecy",
-    eventDate: "2030-06-15",
+    startDate: "2030-06-15",
+    endDate: "2030-06-15",
     organizerId: "organizer-1",
     responseDeadline: deadline,
     allowedCategories,

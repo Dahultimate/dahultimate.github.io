@@ -2,7 +2,7 @@ import { LitElement, css, html, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { fetchEvents } from "../services/events.repository";
 import { fetchEventReferenceItems } from "../services/event-reference-items.repository";
-import type { SportEvent } from "../domain/event";
+import { displayLocation, type SportEvent } from "../domain/event";
 import type { EventFamily, EventReferenceItem } from "../domain/event-reference";
 
 type FamilyFilter = "all" | EventFamily;
@@ -135,10 +135,10 @@ export class EventsBrowser extends LitElement {
           if (family !== this.familyFilter) return false;
         }
         if (!search) return true;
-        const haystack = `${this.eventTypeLabel(event.eventTypeId)} ${event.category} ${event.location}`.toLowerCase();
+        const haystack = `${event.name} ${this.eventTypeLabel(event.eventTypeId)} ${event.category} ${displayLocation(event.location)}`.toLowerCase();
         return haystack.includes(search);
       })
-      .sort((a, b) => a.eventDate.localeCompare(b.eventDate));
+      .sort((a, b) => a.startDate.localeCompare(b.startDate));
   }
 
   private handleSelect(event: SportEvent): void {
@@ -177,8 +177,8 @@ export class EventsBrowser extends LitElement {
                 (event) => html`
                   <li>
                     <button @click=${() => this.handleSelect(event)}>
-                      <span class="name">${this.eventTypeLabel(event.eventTypeId)} — ${event.category}</span>
-                      <span class="meta">${event.eventDate} · ${event.location}</span>
+                      <span class="name">${event.name}</span>
+                      <span class="meta">${event.startDate} · ${displayLocation(event.location)}</span>
                     </button>
                   </li>
                 `,

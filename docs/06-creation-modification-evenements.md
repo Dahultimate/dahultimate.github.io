@@ -5,6 +5,16 @@
 Permettre aux admins de créer et modifier un événement (type, catégorie, format, division, lieu, date, porteur de projet, date butoir, catégories autorisées à participer).
 
 > **Changement par rapport à l'énoncé initial** : la spec prévoyait que les coachs puissent aussi créer/modifier des événements. Décision prise en cours de développement (après la phase 6) : cette action est réservée aux **admins uniquement**. Voir `supabase/migrations/0007_events_edit_admin_only.sql`. Les coachs conservent tous les autres droits prévus par la spec (consultation, déclaration de disponibilité).
+>
+> **Changement (après la phase 8)**, voir `supabase/migrations/0009_events_dates_location.sql` :
+> - Le **lieu devient facultatif** (colonne `location` nullable) ; l'application affiche "Lieu inconnu" quand il est vide (`domain/event.ts::displayLocation()`).
+> - `event_date` est remplacé par un couple **`start_date`/`end_date`** (date de fin toujours ≥ date de début).
+> - La contrainte sur la date butoir passe de "≤ date de l'événement" à **strictement avant la date de début** (`response_deadline < start_date`).
+> - Le formulaire (`event-form.ts`) remplace les cases à cocher des catégories autorisées par des **boutons/puces tactiles**, avec un bouton "Toutes les catégories" (bascule tout sélectionner / tout désélectionner).
+>
+> **Changement (nom d'événement)**, voir `supabase/migrations/0010_events_name.sql` : les événements ont désormais un **nom** (colonne `name`, obligatoire). Il est pré-rempli automatiquement (`domain/event.ts::computeDefaultEventName()`, testé) par la concaténation type + catégorie + format + division dès que l'un de ces champs change dans le formulaire — ex. "Championnat Open Indoor N3" — mais reste librement modifiable : dès que l'utilisateur tape dans le champ "Nom", le pré-remplissage automatique s'arrête pour cet événement. C'est ce nom qui est maintenant affiché comme titre dans le détail, les listes et l'accueil (le type/la catégorie restent visibles en sous-titre dans le détail).
+>
+> **Changement (porteur de projet facultatif)**, voir `supabase/migrations/0011_events_organizer_optional.sql` : `organizer_id` est désormais nullable. Le formulaire propose une option "— Aucun —" (plus de sélection automatique du premier membre par défaut) et le détail affiche "Non renseigné" quand aucun porteur n'est choisi (`domain/event.ts::displayOrganizerName()`, testé).
 
 ## Actions réalisées (Claude)
 

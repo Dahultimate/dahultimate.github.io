@@ -5,7 +5,7 @@ import { fetchAgeCategories } from "../services/age-categories.repository";
 import { fetchMemberDirectory } from "../services/member-directory.repository";
 import { fetchAvailabilitiesForEvent, submitAvailability } from "../services/availabilities.repository";
 import { evaluateParticipants, summarizeParticipants, type ParticipantEvaluation } from "../domain/event-participation";
-import type { SportEvent } from "../domain/event";
+import { displayLocation, displayOrganizerName, type SportEvent } from "../domain/event";
 import type { Member } from "../domain/member";
 import type { AvailabilityStatus } from "../domain/availability";
 import type { EventFamily } from "../domain/event-reference";
@@ -31,7 +31,12 @@ export class EventDetail extends LitElement {
     }
     h2 {
       font-size: 1.2rem;
+      margin: 0 0 0.2rem;
+    }
+    .subtitle {
       margin: 0 0 0.4rem;
+      font-size: 0.85rem;
+      color: var(--color-text-muted, #6b7280);
     }
     dl {
       display: grid;
@@ -217,8 +222,7 @@ export class EventDetail extends LitElement {
     this.labels = labels;
     this.eventTypeFamily = eventTypes.find((t) => t.id === this.event.eventTypeId)?.eventFamily ?? null;
 
-    const organizer = members.find((m) => m.id === this.event.organizerId);
-    this.organizerName = organizer ? `${organizer.firstName} ${organizer.lastName}` : "—";
+    this.organizerName = displayOrganizerName(this.event.organizerId, members);
 
     this.evaluations = evaluateParticipants(members, ageCategories, this.event.allowedCategories, availabilities);
     this.loading = false;
@@ -337,7 +341,8 @@ export class EventDetail extends LitElement {
     return html`
       <header>
         <div>
-          <h2>${this.labels.get(this.event.eventTypeId) ?? "—"} — ${this.event.category}</h2>
+          <h2>${this.event.name}</h2>
+          <p class="subtitle">${this.labels.get(this.event.eventTypeId) ?? "—"} — ${this.event.category}</p>
         </div>
         <div class="actions">
           ${canEdit
@@ -355,9 +360,13 @@ export class EventDetail extends LitElement {
         <dt>Division</dt>
         <dd>${this.labels.get(this.event.divisionId) ?? "—"}</dd>
         <dt>Lieu</dt>
-        <dd>${this.event.location}</dd>
-        <dt>Date</dt>
-        <dd>${this.event.eventDate}</dd>
+        <dd>${displayLocation(this.event.location)}</dd>
+        <dt>Date${this.event.startDate === this.event.endDate ? "" : "s"}</dt>
+        <dd>
+          ${this.event.startDate === this.event.endDate
+            ? this.event.startDate
+            : html`du ${this.event.startDate} au ${this.event.endDate}`}
+        </dd>
         <dt>Porteur de projet</dt>
         <dd>${this.organizerName}</dd>
         <dt>Date butoir de réponse</dt>

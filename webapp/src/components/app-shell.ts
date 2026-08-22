@@ -172,6 +172,10 @@ export class AppShell extends LitElement {
   }
 
   private goTo(tab: Tab): void {
+    // Navigation "normale" (menu) : on efface une éventuelle sélection
+    // d'événement laissée par un clic depuis l'Accueil, sinon un simple
+    // retour sur "Événements" rouvrirait ce même événement à chaque fois.
+    this.selectedEvent = null;
     this.tab = tab;
     this.drawerOpen = false;
   }

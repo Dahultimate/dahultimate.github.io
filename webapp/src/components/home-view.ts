@@ -1,11 +1,10 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { fetchEvents } from "../services/events.repository";
-import { fetchEventReferenceItems } from "../services/event-reference-items.repository";
 import { fetchAgeCategories } from "../services/age-categories.repository";
 import { fetchOwnRespondedEventIds } from "../services/availabilities.repository";
 import { findUnansweredEvents } from "../domain/event-participation";
-import type { SportEvent } from "../domain/event";
+import { displayLocation, type SportEvent } from "../domain/event";
 import type { Member } from "../domain/member";
 
 @customElement("home-view")
@@ -77,7 +76,6 @@ export class HomeView extends LitElement {
   @property({ attribute: false }) member!: Member;
 
   @state() private unanswered: SportEvent[] = [];
-  @state() private eventTypeLabels = new Map<string, string>();
   @state() private loading = true;
 
   override connectedCallback(): void {
@@ -87,15 +85,13 @@ export class HomeView extends LitElement {
 
   private async load(): Promise<void> {
     this.loading = true;
-    const [events, eventTypes, ageCategories, respondedIds] = await Promise.all([
+    const [events, ageCategories, respondedIds] = await Promise.all([
       fetchEvents(),
-      fetchEventReferenceItems("event_type"),
       fetchAgeCategories(),
       fetchOwnRespondedEventIds(),
     ]);
-    this.eventTypeLabels = new Map(eventTypes.map((t) => [t.id, t.label]));
     this.unanswered = findUnansweredEvents(events, this.member, ageCategories, respondedIds).sort((a, b) =>
-      a.eventDate.localeCompare(b.eventDate),
+      a.startDate.localeCompare(b.startDate),
     );
     this.loading = false;
   }
@@ -120,8 +116,8 @@ export class HomeView extends LitElement {
                   (event) => html`
                     <li>
                       <button @click=${() => this.handleSelect(event)}>
-                        <span class="name">${this.eventTypeLabels.get(event.eventTypeId) ?? "—"} — ${event.category}</span>
-                        <span class="meta">${event.eventDate} · ${event.location}</span>
+                        <span class="name">${event.name}</span>
+                        <span class="meta">${event.startDate} · ${displayLocation(event.location)}</span>
                       </button>
                     </li>
                   `,
