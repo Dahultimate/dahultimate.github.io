@@ -5,33 +5,40 @@ import type { Member } from "../domain/member";
 import "./admin-members-view";
 import "./age-categories-view";
 import "./event-reference-admin-view";
+import "./events-view";
 
-type Tab = "home" | "members" | "age-categories" | "event-references";
+type Tab = "home" | "members" | "age-categories" | "event-references" | "events";
 
 interface TabDef {
   id: Tab;
   label: string;
-  adminOnly: boolean;
+  visible: (member: Member) => boolean;
   render: () => TemplateResult;
 }
 
 const TABS: readonly TabDef[] = [
   {
+    id: "events",
+    label: "Événements",
+    visible: (member) => member.isCoach || member.isAdmin,
+    render: () => html`<events-view></events-view>`,
+  },
+  {
     id: "members",
     label: "Membres",
-    adminOnly: true,
+    visible: (member) => member.isAdmin,
     render: () => html`<admin-members-view></admin-members-view>`,
   },
   {
     id: "age-categories",
     label: "Catégories d'âge",
-    adminOnly: true,
+    visible: (member) => member.isAdmin,
     render: () => html`<age-categories-view></age-categories-view>`,
   },
   {
     id: "event-references",
     label: "Référentiels événements",
-    adminOnly: true,
+    visible: (member) => member.isAdmin,
     render: () => html`<event-reference-admin-view></event-reference-admin-view>`,
   },
 ];
@@ -91,7 +98,7 @@ export class AppShell extends LitElement {
   private tab: Tab = "home";
 
   private get visibleTabs(): readonly TabDef[] {
-    return TABS.filter((t) => !t.adminOnly || this.member.isAdmin);
+    return TABS.filter((t) => t.visible(this.member));
   }
 
   override render() {

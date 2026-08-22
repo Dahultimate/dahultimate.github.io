@@ -34,3 +34,12 @@ export type MemberUpdateInput = NewMemberInput & {
   isCoach: boolean;
   active: boolean;
 };
+
+/** Annuaire minimal exposé à tout membre authentifié (RPC member_directory), sans données sensibles. */
+export interface MemberDirectoryEntry {
+  id: string;
+  firstName: string;
+  lastName: string;
+  sex: Sex;
+  birthYear: number;
+}

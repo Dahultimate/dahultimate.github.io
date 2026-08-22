@@ -30,8 +30,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 | 1 | Authentification & connexion | ✅ Validé |
 | 2 | Gestion des membres (admin) | ✅ Validé |
 | 3 | Catégories d'âge | ✅ Validé |
-| 4 | Référentiels d'événements (admin) | 🔧 En cours |
-| 5 | Création & modification d'événements | ⏳ À venir |
+| 4 | Référentiels d'événements (admin) | ✅ Validé |
+| 5 | Création & modification d'événements | 🔧 En cours |
 | 6 | Consultation des événements | ⏳ À venir |
 | 7 | Déclaration de disponibilité | ⏳ À venir |
 | 8 | Finitions ergonomie, sécurité et documentation finale | ⏳ À venir |
