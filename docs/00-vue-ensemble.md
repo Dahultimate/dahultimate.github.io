@@ -37,6 +37,8 @@ Un membre est stocké dans la table `members`, toujours "joueur" de base, avec d
 | 6 | Consultation des événements | ✅ Validé |
 | 7 | Déclaration de disponibilité | ✅ Validé |
 | 8 | Finitions ergonomie, sécurité et documentation finale | 🔧 En cours |
+| — | [Préparation physique](11-preparation-physique.md) (ajoutée après la phase 8) | 🔧 En cours |
+| — | [Sessions de préparation physique & roulement](12-sessions-preparation-physique.md) | 🔧 En cours |
 
 Chaque phase est détaillée dans son propre fichier `docs/NN-nom.md`, avec pour chacune :
 - **Objectif** : ce que la fonctionnalité apporte.

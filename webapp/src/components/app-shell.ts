@@ -9,8 +9,9 @@ import "./admin-members-view";
 import "./age-categories-view";
 import "./event-reference-admin-view";
 import "./events-view";
+import "./physical-prep-view";
 
-type Tab = "home" | "members" | "age-categories" | "event-references" | "events";
+type Tab = "home" | "members" | "age-categories" | "event-references" | "events" | "physical-prep";
 
 /**
  * État complet de navigation, synchronisé avec l'historique du navigateur
@@ -38,6 +39,7 @@ interface TabDef {
 const TABS: readonly TabDef[] = [
   { id: "home", label: "Accueil", icon: "🏠", visible: () => true },
   { id: "events", label: "Événements", icon: "📅", visible: () => true },
+  { id: "physical-prep", label: "Préparation physique", icon: "💪", visible: () => true },
   { id: "members", label: "Membres", icon: "👥", visible: (member) => member.isAdmin },
   { id: "age-categories", label: "Catégories", icon: "🎂", visible: (member) => member.isAdmin },
   { id: "event-references", label: "Référentiels", icon: "⚙️", visible: (member) => member.isAdmin },
@@ -243,6 +245,8 @@ export class AppShell extends LitElement {
             this.goToEventsView({ mode: "list" });
           }}
         ></events-view>`;
+      case "physical-prep":
+        return html`<physical-prep-view .member=${this.member}></physical-prep-view>`;
       case "members":
         return html`<admin-members-view></admin-members-view>`;
       case "age-categories":
